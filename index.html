@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Neon Vortex</title>
+<script src="https://www.youtube.com/game_api/v1"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <style>
 :root{--neon:#00e5ff;--neon2:#ff2d95;--neon3:#7c4dff;--gold:#ffd23f;--bg:#05030c;--card:rgba(18,10,36,0.82)}
@@ -13,6 +14,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:v
 .screen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;pointer-events:auto;text-align:center}
 .screen.active{display:flex}
 .card{background:var(--card);border:1px solid rgba(0,229,255,0.35);border-radius:22px;padding:clamp(20px,5vw,40px) clamp(24px,7vw,56px);backdrop-filter:blur(10px);box-shadow:0 0 40px rgba(124,77,255,0.25),inset 0 0 30px rgba(0,229,255,0.06);max-width:min(92vw,460px);max-height:90vh;overflow-y:auto}
+@media(orientation:landscape){.card{padding:clamp(10px,3vw,20px) clamp(16px,5vw,30px);max-height:95vh;overflow-y:hidden}.card h1{font-size:clamp(22px,5vw,34px);margin:0 0 4px}.card .sub{font-size:clamp(10px,2vw,13px);margin:0 0 10px;line-height:1.3}.card .best{font-size:clamp(11px,2.5vw,14px);margin-bottom:10px}.card .btn{padding:clamp(8px,2vw,12px) clamp(16px,4vw,24px);font-size:clamp(12px,2.8vw,15px);margin:3px;width:min(240px,65vw)}.stat-row{gap:14px;margin-bottom:14px}.stat b{font-size:clamp(16px,3.5vw,22px)}}
 h1{font-size:clamp(28px,7vw,44px);margin:0 0 6px;letter-spacing:2px;background:linear-gradient(90deg,var(--neon),var(--neon3),var(--neon2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{color:#b9b3d6;font-size:clamp(12px,3vw,15px);margin:0 0 20px;line-height:1.5}
 .best{color:var(--gold);font-size:clamp(13px,3.2vw,16px);margin-bottom:18px;letter-spacing:1px}
@@ -113,17 +115,6 @@ h1{font-size:clamp(28px,7vw,44px);margin:0 0 6px;letter-spacing:2px;background:l
 </style>
 </head>
 <body>
-<script>
-// Only load YouTube SDK if running inside YouTube Playables
-(function(){
-  var isYT=(window.parent!==window)&&(document.referrer.indexOf('youtube')>-1||document.referrer.indexOf('google')>-1);
-  if(isYT||typeof ytgame!=='undefined'){
-    var s=document.createElement('script');
-    s.src='https://www.youtube.com/game_api/v1';
-    document.head.appendChild(s);
-  }
-})();
-</script>
 <canvas id="game"></canvas>
 <div id="ui">
   <div id="hud" style="display:none">
