@@ -795,12 +795,12 @@ resetGame();render();
 try{if(typeof ytgame!=='undefined'&&ytgame.game&&ytgame.game.firstFrameReady)ytgame.game.firstFrameReady()}catch(e){}
 try{if(typeof ytgame!=='undefined'&&ytgame.game){
   try{var _ae=ytgame.system.isAudioEnabled();if(typeof _ae==='boolean')audioOn=_ae}catch(e){}
-  try{ytgame.system.onAudioEnabledChange(function(on){audioOn=!!on;setMusicMute(!audioOn)})}catch(e){}
+  try{ytgame.system.onAudioEnabledChange(function(on){audioOn=!!on;setMusicMute(!audioOn);if(audioOn&&state===STATE_PLAY&&!musicTimer){startMusic()}})}catch(e){}
   try{ytgame.system.onPause(function(){platformPause()})}catch(e){}
   try{ytgame.system.onResume(function(){platformResume()})}catch(e){}
 }}catch(e){}
 
-loadSave().then(function(){goStart();setTimeout(function(){try{if(typeof ytgame!=='undefined'&&ytgame.game&&ytgame.game.gameReady)ytgame.game.gameReady()}catch(e){}},80)});
+loadSave().then(function(){goStart();sdkScore(bestScore);setTimeout(function(){try{if(typeof ytgame!=='undefined'&&ytgame.game&&ytgame.game.gameReady)ytgame.game.gameReady()}catch(e){}},80)});
 
 function unlockAllLevels(){for(var i=1;i<=MAX_LEVEL;i++){if(!levelStars[i])levelStars[i]=0}saveGame()}
 
