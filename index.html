@@ -716,7 +716,7 @@ function _resetPlayLocks(){document.getElementById('ui').classList.remove('force
 function setPausedVisual(p){try{document.body.classList.toggle('nv-paused',!!p)}catch(e){}}
 var _adShowing=false;var _screenBeforePause=null;
 function platformPause(){
-  if(state===STATE_PAUSE||state===STATE_START||state===STATE_OVER)return;
+  if(state===STATE_PAUSE)return;
   _screenBeforePause=null;
   var screens=['pauseScreen','overScreen','completeScreen','startScreen','mapScreen','shopScreen'];
   for(var i=0;i<screens.length;i++){var el=document.getElementById(screens[i]);if(el&&el.classList.contains('active')){_screenBeforePause=screens[i];break}}
@@ -726,16 +726,14 @@ function platformPause(){
   try{saveGame()}catch(e){}
 }
 function platformResume(){
-  if(state!==STATE_PAUSE)return;
   if(_adShowing)return;
   setPausedVisual(false);
   try{document.getElementById('platformPauseOverlay').classList.remove('active')}catch(e){}
   document.getElementById('pauseBlocker').style.display='none';
-  if(_screenBeforePause){showScreen(_screenBeforePause);_screenBeforePause=null}
-  else{resumeGame()}
+  if(state===STATE_PAUSE){resumeGame()}
 }
 function resumeGame(){if(state!==STATE_PAUSE)return;state=STATE_PLAY;setPausedVisual(false);try{document.getElementById('platformPauseOverlay').classList.remove('active')}catch(e){}showScreen(null);document.getElementById('steerZones').style.display='block';document.getElementById('coinHud').style.display='block';document.getElementById('puBar').style.display='flex';_resetPlayLocks();initAudio();startMusic();startLoop()}
-async function gameOver(){state=STATE_OVER;explode();stopMusic();document.getElementById('steerZones').style.display='none';document.getElementById('puBar').style.display='none';document.getElementById('coinHud').style.display='none';gamesPlayed++;if(score>bestScore){bestScore=score;saveGame();sdkScore(bestScore)}document.getElementById('finalScore').textContent=score;document.getElementById('finalLevel').textContent=level;document.getElementById('finalBest').textContent=bestScore;var showContinue=!usedContinue&&score>=2;var cbtn=document.getElementById('continueBtn'),cbr=document.getElementById('continueBr');if(cbtn){cbtn.style.display=showContinue?'inline-block':'none';cbtn.disabled=false}if(cbr){cbr.style.display=showContinue?'block':'none'}await new Promise(function(res){setTimeout(res,550)});if(gamesPlayed%2===0)await maybeShowInterstitial('gameover');showScreen('overScreen')}
+async function gameOver(){state=STATE_OVER;explode();stopMusic();document.getElementById('steerZones').style.display='none';document.getElementById('puBar').style.display='none';document.getElementById('coinHud').style.display='none';gamesPlayed++;if(score>bestScore){bestScore=score}saveGame();sdkScore(bestScore);document.getElementById('finalScore').textContent=score;document.getElementById('finalLevel').textContent=level;document.getElementById('finalBest').textContent=bestScore;var showContinue=!usedContinue&&score>=2;var cbtn=document.getElementById('continueBtn'),cbr=document.getElementById('continueBr');if(cbtn){cbtn.style.display=showContinue?'inline-block':'none';cbtn.disabled=false}if(cbr){cbr.style.display=showContinue?'block':'none'}await new Promise(function(res){setTimeout(res,550)});if(gamesPlayed%2===0)await maybeShowInterstitial('gameover');showScreen('overScreen')}
 
 // ─── BUTTONS ────────────────────────────────────
 document.getElementById('playBtn').addEventListener('click',function(){initAudio();sndClick();if(lastPlayedLevel>0){currentLevel=lastPlayedLevel}else{currentLevel=getHighestClearedLevel()}if(currentLevel>MAX_LEVEL)currentLevel=MAX_LEVEL;goPlay()},false);
