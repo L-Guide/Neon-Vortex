@@ -324,7 +324,7 @@ function setMusicMute(mute){if(musicGain)musicGain.gain.value=mute?0:0.3}
 var bestScore=0,levelStars={},coins=0,currentLevel=1,lastPlayedLevel=0;
 function loadSave(){return new Promise(function(resolve){try{if(typeof ytgame!=='undefined'&&ytgame.game&&ytgame.game.loadData){ytgame.game.loadData().then(function(d){try{var o=d?JSON.parse(d):{};bestScore=(o&&o.best)||0;levelStars=(o&&o.stars)||{};coins=(o&&o.coins)||0;puCounts=(o&&o.pu)||{shield:3,slow:3,ghost:2};currentLevel=Math.min(getHighestClearedLevel(),MAX_LEVEL);lastPlayedLevel=(o&&o.lp)||0}catch(e){}resolve()}).catch(function(){resolve()})}else{try{var s=localStorage.getItem('nv_save');if(s){var o=JSON.parse(s);bestScore=o.best||0;levelStars=o.stars||{};coins=o.coins||0;if(o.pu)puCounts=o.pu;currentLevel=Math.min(getHighestClearedLevel(),MAX_LEVEL);lastPlayedLevel=o.lp||0}}catch(e){}resolve()}}catch(e){resolve()}})}
 function saveGame(){try{var data=JSON.stringify({best:bestScore,stars:levelStars,coins:coins,pu:puCounts,lp:lastPlayedLevel});if(typeof ytgame!=='undefined'&&ytgame.game&&ytgame.game.saveData)ytgame.game.saveData(data);else localStorage.setItem('nv_save',data)}catch(e){}}
-function sdkScore(s){try{if(typeof ytgame!=='undefined'&&ytgame.engagement)ytgame.engagement.sendScore({value:Math.floor(s)});}catch(e){}}
+function sdkScore(s){try{if(typeof ytgame!=='undefined'&&ytgame.engagement&&typeof ytgame.engagement.sendScore==='function')ytgame.engagement.sendScore({value:Math.floor(s)});}catch(e){}}
 
 var adToastTimer=null;
 function showAdToast(){var el=document.getElementById('adToast');if(!el)return;el.style.opacity='1';if(adToastTimer)clearTimeout(adToastTimer);adToastTimer=setTimeout(function(){el.style.opacity='0'},1800)}
@@ -546,7 +546,7 @@ function update(dt){
       if(inGap(angle,ring)){score+=1;levelScore+=1;sndPass();checkLevelComplete()}
       else if(ghostActive){/* ghost passes through */}
       else if(shieldActive){shieldActive=false;sndShield();showPowerToast('SHIELD BROKEN!')}
-      else{sndCrash();gameOver();return}
+      else{if(score>=bestScore)bestScore=score;saveGame();sdkScore(bestScore);sndCrash();gameOver();return}
     }
     if(ring.r<-40)rings.splice(i,1)
   }
@@ -800,7 +800,7 @@ try{if(typeof ytgame!=='undefined'&&ytgame.game){
   try{ytgame.system.onResume(function(){platformResume()})}catch(e){}
 }}catch(e){}
 
-loadSave().then(function(){goStart();sdkScore(bestScore);setTimeout(function(){try{if(typeof ytgame!=='undefined'&&ytgame.game&&ytgame.game.gameReady)ytgame.game.gameReady()}catch(e){}},80)});
+loadSave().then(function(){goStart();setTimeout(function(){try{if(typeof ytgame!=='undefined'&&ytgame.game&&ytgame.game.gameReady)ytgame.game.gameReady()}catch(e){}sdkScore(bestScore)},80)});
 
 function unlockAllLevels(){for(var i=1;i<=MAX_LEVEL;i++){if(!levelStars[i])levelStars[i]=0}saveGame()}
 
