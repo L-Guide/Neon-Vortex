@@ -337,9 +337,9 @@ function showAdNotAvailable(btn){
   btn.style.opacity='0.6';
   setTimeout(function(){btn.textContent=orig;btn.disabled=false;btn.style.opacity=''},2000);
 }
-async function tryContinueWithAd(){sndClick();var cbtn=document.getElementById('continueBtn');if(cbtn)cbtn.disabled=true;try{if(typeof ytgame==='undefined'||!ytgame.ads||typeof ytgame.ads.requestRewardedAd!=='function'){showAdNotAvailable(cbtn);return}var rewardEarned=await ytgame.ads.requestRewardedAd('continue_run');if(rewardEarned)revivePlayer();else{showAdNotAvailable(cbtn)}}catch(e){showAdNotAvailable(cbtn)}}
-function revivePlayer(){usedContinue=true;document.getElementById('continueBtn').style.display='none';document.getElementById('continueBr').style.display='none';rings=rings.filter(function(r){return Math.abs(r.r-playerR)>60});showScreen(null);document.getElementById('hud').style.display='flex';document.getElementById('coinHud').style.display='block';document.getElementById('steerZones').style.display='block';document.getElementById('puBar').style.display='flex';_resetPlayLocks();state=STATE_PLAY;resumeAudioAfterAd();startMusic();startLoop()}
-function resumeAudioAfterAd(){try{if(!audioCtx){initAudio();return}if(audioCtx.state==='suspended'){audioCtx.resume().catch(function(){})}if(sfxGain)sfxGain.gain.value=1.0;if(musicGain)musicGain.gain.value=0.3;audioOn=true}catch(e){initAudio()}}
+async function tryContinueWithAd(){sndClick();initAudio();var cbtn=document.getElementById('continueBtn');if(cbtn)cbtn.disabled=true;try{if(typeof ytgame==='undefined'||!ytgame.ads||typeof ytgame.ads.requestRewardedAd!=='function'){showAdNotAvailable(cbtn);return}var rewardEarned=await ytgame.ads.requestRewardedAd('continue_run');if(rewardEarned)revivePlayer();else{showAdNotAvailable(cbtn)}}catch(e){showAdNotAvailable(cbtn)}}
+function revivePlayer(){usedContinue=true;document.getElementById('continueBtn').style.display='none';document.getElementById('continueBr').style.display='none';rings=rings.filter(function(r){return Math.abs(r.r-playerR)>60});showScreen(null);document.getElementById('hud').style.display='flex';document.getElementById('coinHud').style.display='block';document.getElementById('steerZones').style.display='block';document.getElementById('puBar').style.display='flex';_resetPlayLocks();state=STATE_PLAY;forceResumeAudio();startMusic();startLoop()}
+function forceResumeAudio(){try{if(!audioCtx){initAudio();return}if(audioCtx.state!=='running'){audioCtx.resume().catch(function(){})}if(sfxGain)sfxGain.gain.value=1.0;if(musicGain)musicGain.gain.value=0.3;audioOn=true;setTimeout(function(){if(audioCtx&&audioCtx.state!=='running')audioCtx.resume().catch(function(){});if(sfxGain)sfxGain.gain.value=1.0;if(musicGain)musicGain.gain.value=0.3;},200);setTimeout(function(){if(audioCtx&&audioCtx.state!=='running')audioCtx.resume().catch(function(){});if(sfxGain)sfxGain.gain.value=1.0;if(musicGain)musicGain.gain.value=0.3;},500)}catch(e){initAudio()}}
 
 // ─── CONSTANTS ──────────────────────────────────
 var MAX_LEVEL=100;
@@ -733,7 +733,7 @@ function platformResume(){
   document.getElementById('pauseBlocker').style.display='none';
   if(state===STATE_PAUSE){resumeGame()}
 }
-function resumeGame(){if(state!==STATE_PAUSE)return;state=STATE_PLAY;setPausedVisual(false);try{document.getElementById('platformPauseOverlay').classList.remove('active')}catch(e){}showScreen(null);document.getElementById('steerZones').style.display='block';document.getElementById('coinHud').style.display='block';document.getElementById('puBar').style.display='flex';_resetPlayLocks();initAudio();startMusic();startLoop()}
+function resumeGame(){if(state!==STATE_PAUSE)return;state=STATE_PLAY;setPausedVisual(false);try{document.getElementById('platformPauseOverlay').classList.remove('active')}catch(e){}showScreen(null);document.getElementById('steerZones').style.display='block';document.getElementById('coinHud').style.display='block';document.getElementById('puBar').style.display='flex';_resetPlayLocks();forceResumeAudio();startMusic();startLoop()}
 async function gameOver(){state=STATE_OVER;explode();stopMusic();document.getElementById('steerZones').style.display='none';document.getElementById('puBar').style.display='none';document.getElementById('coinHud').style.display='none';gamesPlayed++;if(score>bestScore){bestScore=score}saveGame();sdkScore(bestScore);document.getElementById('finalScore').textContent=score;document.getElementById('finalLevel').textContent=level;document.getElementById('finalBest').textContent=bestScore;var showContinue=!usedContinue&&score>=2;var cbtn=document.getElementById('continueBtn'),cbr=document.getElementById('continueBr');if(cbtn){cbtn.style.display=showContinue?'inline-block':'none';cbtn.disabled=false}if(cbr){cbr.style.display=showContinue?'block':'none'}await new Promise(function(res){setTimeout(res,550)});if(gamesPlayed%2===0)await maybeShowInterstitial('gameover');showScreen('overScreen')}
 
 // ─── BUTTONS ────────────────────────────────────
@@ -873,6 +873,11 @@ function animateConfetti(){
 }
 
 function stopConfetti(){if(confettiTimer)cancelAnimationFrame(confettiTimer);if(confettiCanvas){confettiCanvas.remove();confettiCanvas=null;confettiCtx=null}}
+
+// Global audio unlock - ensure AudioContext resumes after any user gesture (iOS fix)
+document.addEventListener('click',function(){if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();},false);
+document.addEventListener('touchstart',function(){if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();},false);
+document.addEventListener('keydown',function(){if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();},false);
 
 })();
 </script>
