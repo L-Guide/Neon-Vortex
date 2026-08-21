@@ -338,7 +338,8 @@ function showAdNotAvailable(btn){
   setTimeout(function(){btn.textContent=orig;btn.disabled=false;btn.style.opacity=''},2000);
 }
 async function tryContinueWithAd(){sndClick();var cbtn=document.getElementById('continueBtn');if(cbtn)cbtn.disabled=true;try{if(typeof ytgame==='undefined'||!ytgame.ads||typeof ytgame.ads.requestRewardedAd!=='function'){showAdNotAvailable(cbtn);return}var rewardEarned=await ytgame.ads.requestRewardedAd('continue_run');if(rewardEarned)revivePlayer();else{showAdNotAvailable(cbtn)}}catch(e){showAdNotAvailable(cbtn)}}
-function revivePlayer(){usedContinue=true;document.getElementById('continueBtn').style.display='none';document.getElementById('continueBr').style.display='none';rings=rings.filter(function(r){return Math.abs(r.r-playerR)>60});showScreen(null);document.getElementById('hud').style.display='flex';document.getElementById('coinHud').style.display='block';document.getElementById('steerZones').style.display='block';document.getElementById('puBar').style.display='flex';_resetPlayLocks();state=STATE_PLAY;startMusic();startLoop()}
+function revivePlayer(){usedContinue=true;document.getElementById('continueBtn').style.display='none';document.getElementById('continueBr').style.display='none';rings=rings.filter(function(r){return Math.abs(r.r-playerR)>60});showScreen(null);document.getElementById('hud').style.display='flex';document.getElementById('coinHud').style.display='block';document.getElementById('steerZones').style.display='block';document.getElementById('puBar').style.display='flex';_resetPlayLocks();state=STATE_PLAY;resumeAudioAfterAd();startMusic();startLoop()}
+function resumeAudioAfterAd(){try{if(!audioCtx){initAudio();return}if(audioCtx.state==='suspended'){audioCtx.resume().catch(function(){})}if(sfxGain)sfxGain.gain.value=1.0;if(musicGain)musicGain.gain.value=0.3;audioOn=true}catch(e){initAudio()}}
 
 // ─── CONSTANTS ──────────────────────────────────
 var MAX_LEVEL=100;
